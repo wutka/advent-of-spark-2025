@@ -88,6 +88,10 @@ begin
    end loop;
 
    Close (Data_File);
+   if Is_Open (Data_File) then
+      Put_Line ("Error closing file");
+   end if;
+
    Put ("Day1a = ");
    Put (Zero_Count_A);
    New_Line;
