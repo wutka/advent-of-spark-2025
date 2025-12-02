@@ -1,0 +1,12 @@
+name = "day2"
+description = "Advent of Code 2025 Day 2"
+version = "0.1.0-dev"
+
+authors = ["Mark Wutka"]
+maintainers = ["Mark Wutka <mark@wutka.com>"]
+maintainers-logins = ["wutka"]
+licenses = "MIT OR Apache-2.0 WITH LLVM-exception"
+website = ""
+tags = []
+
+executables = ["day2"]
