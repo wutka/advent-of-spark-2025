@@ -1,2 +1,2 @@
-last_build_profile = "day2=DEVELOPMENT"
+last_build_profile = "day2=DEVELOPMENT,gnatprove=RELEASE"
 
