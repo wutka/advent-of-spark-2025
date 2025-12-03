@@ -1,3 +1,5 @@
+pragma Spark_Mode (On);
+
 with Ada.Text_IO; use Ada.Text_IO;
 
 procedure Day3 is
@@ -8,6 +10,7 @@ procedure Day3 is
    type Digit_Array is array (Positive range <>) of Single_Digit;
 
    Data_File : File_Type;
+   Ch : Character;
    Line : String (1 .. 1000);
    Line_Digits : Digit_Array (1 .. 1000);
    Best_Digits : Digit_Array (1 .. 12);
@@ -42,20 +45,30 @@ procedure Day3 is
       Highest_Digit : out Single_Digit;
       Highest_Pos : out Natural)
       with
-         Pre => (Start_Pos >= 1 and then End_Pos <= Line_Digits'Length),
+         Pre => (Line_Digits'First = 1 and then
+            Start_Pos < Natural'Last and then
+            Start_Pos >= 1 and then Start_Pos <= End_Pos
+            and then End_Pos <= Line_Digits'Length),
          Post => (Highest_Pos >= Start_Pos and then
             Highest_Pos <= End_Pos)
    is
    begin
-      Highest_Digit := Line_Digits (Start_Pos);
       Highest_Pos := Start_Pos;
+      Highest_Digit := 0;
+      if Start_Pos >= 1 and then Start_Pos <= Line_Digits'Length
+      then
+         Highest_Digit := Line_Digits (Start_Pos);
 
-      for I in Start_Pos + 1 .. End_Pos loop
-         if Line_Digits (I) > Highest_Digit then
-            Highest_Digit := Line_Digits (I);
-            Highest_Pos := I;
-         end if;
-      end loop;
+         for I in Start_Pos + 1 .. End_Pos loop
+            if Line_Digits (I) > Highest_Digit then
+               Highest_Digit := Line_Digits (I);
+               Highest_Pos := I;
+            end if;
+
+            pragma Loop_Invariant (Highest_Pos >= Start_Pos and then
+               Highest_Pos <= End_Pos);
+         end loop;
+      end if;
    end Find_Highest_In_Range;
 
    procedure Find_Highest_Number (Line_Digits : Digit_Array;
@@ -67,9 +80,7 @@ procedure Day3 is
       Last_Pos : Natural;
       Offset : Natural;
    begin
-      Best_Digits := (others => 0);
       Start_Pos := 1;
-      Highest_Pos := 1;
 
       --  Find the highest I'th digit
       for I in 1 .. Best_Digits'Length loop
@@ -105,27 +116,43 @@ procedure Day3 is
 begin
    Jolt_Sum_A := 0;
    Jolt_Sum_B := 0;
+   Best_Digits := (others => 0);
+   Line := (others => '0');
 
    Open (File => Data_File,
          Mode => In_File,
          Name => "data/day3.txt");
 
    while not End_Of_File (Data_File) loop
-      Get_Line (Data_File, Line, Last);
-      Line_To_Digits (Line (1 .. Last), Line_Digits);
+      Last := 0;
 
-      Find_Highest_Number (Line_Digits (1 .. Last), Best_Digits (1 .. 2),
-         Highest);
+      while not End_Of_Line (Data_File) loop
+         Get (Data_File, Ch);
+         if Last < Line'Length then
+            Last := Last + 1;
+            if Last in Line'Range then
+               Line (Last) := Ch;
+            end if;
+         end if;
+      end loop;
+      Skip_Line (Data_File);
 
-      if Jolt_Sum_A < Nat_64'Last - Highest then
-         Jolt_Sum_A := Jolt_Sum_A + Highest;
-      end if;
+      if Last in Line'Range then
+         Line_To_Digits (Line (1 .. Last), Line_Digits);
 
-      Find_Highest_Number (Line_Digits (1 .. Last), Best_Digits (1 .. 12),
-         Highest);
+         Find_Highest_Number (Line_Digits (1 .. Last),
+            Best_Digits (1 .. 2), Highest);
 
-      if Jolt_Sum_B < Nat_64'Last - Highest then
-         Jolt_Sum_B := Jolt_Sum_B + Highest;
+         if Jolt_Sum_A < Nat_64'Last - Highest then
+            Jolt_Sum_A := Jolt_Sum_A + Highest;
+         end if;
+
+         Find_Highest_Number (Line_Digits (1 .. Last),
+            Best_Digits (1 .. 12), Highest);
+
+         if Jolt_Sum_B < Nat_64'Last - Highest then
+            Jolt_Sum_B := Jolt_Sum_B + Highest;
+         end if;
       end if;
    end loop;
 
@@ -137,4 +164,6 @@ begin
    Nat_64_IO.Put (Jolt_Sum_B, Width => 0);
    New_Line;
 
+exception
+   when others => Put_Line ("Exception");
 end Day3;

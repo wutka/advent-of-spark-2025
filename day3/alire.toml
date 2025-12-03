@@ -10,3 +10,6 @@ website = ""
 tags = []
 
 executables = ["day3"]
+
+[[depends-on]]
+gnatprove = "^15.1.0"
