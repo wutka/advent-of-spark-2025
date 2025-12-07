@@ -183,10 +183,12 @@ begin
                Grid_Val := 1;
                if Num_Grid2 (Col, N) < 100000 then
                   Grid_Val := Num_Grid2 (Col, N);
-                  if Grid_Val > 0 and then
-                     Num_B < Nat_64'Last / Grid_Val
-                  then
-                     Num_B := Num_B * Grid_Val;
+                  if Grid_Val > 0 then
+                     if Num_B > 0 and then
+                        Num_B < 100000000000000
+                     then
+                        Num_B := Num_B * Grid_Val;
+                     end if;
                   end if;
                end if;
                pragma Loop_Invariant (Grid_Val < 100000);
