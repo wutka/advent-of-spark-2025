@@ -1,0 +1,6 @@
+   type Dist_Type is record
+      From_Pos : Coord_Range;
+      To_Pos : Coord_Range;
+      Dist : Nat_64;
+   end record;
+
