@@ -129,6 +129,9 @@ begin
    end loop;
 
    if Num_Coords > 1 then
+
+      --  Compute the distances between all the coordinates
+      --  and store them in a binary heap
       for I in 1 .. Num_Coords - 1 loop
          for J in I + 1 .. Num_Coords loop
             Dist := Coord_Sq_Dist (Coords (I), Coords (J));
@@ -144,6 +147,7 @@ begin
       Num_Circuits := 0;
       Num_Groups := 1000;
 
+      --  Process all the distances
       while not Dist_Heap.Dist_Heap.Is_Empty (Dists) loop
          Dist_Heap.Dist_Heap.Top (Dists, Dist_Rec);
 
@@ -152,6 +156,7 @@ begin
          Best_From_Group := Coords (Best_From_Pos).Group;
          Best_To_Group := Coords (Best_To_Pos).Group;
 
+         --  If the distances aren't in the same group, merge them
          if Best_From_Group /= Best_To_Group then
             for J in Coord_Range loop
                if Coords (J).Group = Best_To_Group then
@@ -171,6 +176,8 @@ begin
                Num_Groups := Num_Groups - 1;
             end if;
 
+            --  If there is only one group left, compute
+            --  the answer for the second part
             if Num_Groups = 1 then
                Put ("day8b = ");
                if Coords (Best_From_Pos).X > 0 and then
@@ -192,7 +199,10 @@ begin
             Num_Circuits := Num_Circuits + 1;
          end if;
 
+         --  If we have connected exactly 1000 circuits,
+         --  compute the answer for the first part
          if Num_Circuits = 1000 then
+            --  Rather than sorting, just manually track the top 3
             for I in Coord_Range loop
                if Group_Sizes (I) > Top_Sizes (1) then
                   Top_Sizes (3) := Top_Sizes (2);
@@ -205,6 +215,7 @@ begin
                   Top_Sizes (3) := Group_Sizes (I);
                end if;
             end loop;
+
             Sum := Top_Sizes (1);
             if Top_Sizes (2) > 0 and then
                Sum < Natural'Last / Top_Sizes (2)
