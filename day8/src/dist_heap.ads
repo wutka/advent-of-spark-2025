@@ -13,11 +13,11 @@ package Dist_Heap is
       To_Pos : Coord_Range;
       Dist : Nat_64;
    end record;
-   
+
    function Dist_Less (A, B : Dist_Type) return Boolean
    is (A.Dist < B.Dist or else (A.Dist = B.Dist and then
       A.From_Pos < B.From_Pos) or else
-      (A.Dist = B.Dist and A.From_Pos = B.From_Pos and
+      (A.Dist = B.Dist and then A.From_Pos = B.From_Pos and then
        A.To_Pos < B.To_Pos));
 
    package Dist_Heap is new Simple_Binary_Heap (
