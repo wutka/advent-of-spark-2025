@@ -42,9 +42,6 @@ procedure Day11 is
    ID_Num : ID_Num_Range;
    Parent_Num : ID_Num_Range;
    Path_Counts : Path_Count_Map.Map (700);
-   Path_Counts_B1 : Path_Count_Map.Map (700);
-   Path_Counts_B2 : Path_Count_Map.Map (700);
-   Path_Counts_B3 : Path_Count_Map.Map (700);
    Visits_FFT : Visit_Map.Map (700);
    Visits_1 : Visit_Map.Map (700);
    Visits_2 : Visit_Map.Map (700);
@@ -328,37 +325,43 @@ begin
       Second_ID := 4;
    end if;
 
-   --  Initialize Path_Counts_B1 with a count of 1 to out
-   if Path_Count_Map.Length (Path_Counts_B1) < Path_Counts.Capacity
-      and then not Path_Count_Map.Contains (Path_Counts_B1, 1)
+   Path_Count_Map.Clear (Path_Counts);
+
+   --  Initialize Path_Counts with a count of 1 to out
+   if Path_Count_Map.Length (Path_Counts) < Path_Counts.Capacity
+      and then not Path_Count_Map.Contains (Path_Counts, 1)
    then
-      Path_Count_Map.Insert (Path_Counts_B1, 1, 1);
+      Path_Count_Map.Insert (Path_Counts, 1, 1);
    end if;
 
    --  Find the path count from First_ID to out
-   Get_Path_Count (First_ID, Path_Counts_B1, Connections, Count);
+   Get_Path_Count (First_ID, Path_Counts, Connections, Count);
 
-   --  Initialize Path_Counts_B2 with a path count of Count to First_ID
-   if Path_Count_Map.Length (Path_Counts_B2) < Path_Counts.Capacity
-      and then not Path_Count_Map.Contains (Path_Counts_B2, First_ID)
+   Path_Count_Map.Clear (Path_Counts);
+
+   --  Initialize Path_Counts with a path count of Count to First_ID
+   if Path_Count_Map.Length (Path_Counts) < Path_Counts.Capacity
+      and then not Path_Count_Map.Contains (Path_Counts, First_ID)
    then
-      Path_Count_Map.Insert (Path_Counts_B2, First_ID, Count);
+      Path_Count_Map.Insert (Path_Counts, First_ID, Count);
    end if;
 
    --  Find the path count from Second_ID to First_ID
    Get_Path_Count_B (Second_ID, First_ID, Visits_1,
-      Path_Counts_B2, Connections, Count);
+      Path_Counts, Connections, Count);
 
-   --  Initialize Path_Counts_B3 with a path count of Count to Second_ID
-   if Path_Count_Map.Length (Path_Counts_B3) < Path_Counts.Capacity
-      and then not Path_Count_Map.Contains (Path_Counts_B3, Second_ID)
+   Path_Count_Map.Clear (Path_Counts);
+
+   --  Initialize Path_Counts with a path count of Count to Second_ID
+   if Path_Count_Map.Length (Path_Counts) < Path_Counts.Capacity
+      and then not Path_Count_Map.Contains (Path_Counts, Second_ID)
    then
-      Path_Count_Map.Insert (Path_Counts_B3, Second_ID, Count);
+      Path_Count_Map.Insert (Path_Counts, Second_ID, Count);
    end if;
 
    --  Count the paths from svr to Second_ID
    Get_Path_Count_B (2, Second_ID, Visits_2,
-      Path_Counts_B3, Connections, Count);
+      Path_Counts, Connections, Count);
 
    Put ("Day 11b = ");
    Put (Count, Width => 0);
