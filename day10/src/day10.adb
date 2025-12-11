@@ -212,6 +212,6 @@ begin
    Put ("Day 10b = ");
    Put (Sum_B);
    New_Line;
-  exception
-     when others => Put_Line ("Exception");
+exception
+   when others => Put_Line ("Exception");
 end Day10;

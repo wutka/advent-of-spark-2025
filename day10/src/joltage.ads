@@ -22,6 +22,10 @@ package Joltage is
       Required_Joltages : Joltage_Array_Type;
       Max_Joltage_Num : Light_Number_Range) return Boolean;
 
+   function Joltages_Valid (Joltages : Joltage_Array_Type;
+      Required_Joltages : Joltage_Array_Type;
+      Max_Joltage_Num : Light_Number_Range) return Boolean;
+
    procedure Try_Presses (Buttons : Button_Array_Type;
       Num_Buttons : Buttons_Range;
       Required_Joltages : Joltage_Array_Type;
@@ -40,6 +44,7 @@ package Joltage is
       Max_Joltage_Num : Light_Number_Range;
       Tried : in out Tried_Array_Type;
       Lights_Tried : in out Light_Tried_Array_Type;
+      Target_Light : Light_Number_Range;
       Path_Len : Natural;
       Shortest_Path : in out Natural);
 end Joltage;

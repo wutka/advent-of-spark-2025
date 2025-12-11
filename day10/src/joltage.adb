@@ -57,6 +57,19 @@ package body Joltage is
       return True;
    end Joltages_Match;
 
+   function Joltages_Valid (Joltages : Joltage_Array_Type;
+      Required_Joltages : Joltage_Array_Type;
+      Max_Joltage_Num : Light_Number_Range) return Boolean
+   is
+   begin
+      for I in 0 .. Max_Joltage_Num loop
+         if Joltages (I) > Required_Joltages (I) then
+            return False;
+         end if;
+      end loop;
+      return True;
+   end Joltages_Valid;
+
    procedure Try_Presses (Buttons : Button_Array_Type;
       Num_Buttons : Buttons_Range;
       Required_Joltages : Joltage_Array_Type;
@@ -76,7 +89,6 @@ package body Joltage is
       Try_Button_Count : Buttons_Range;
       Buttons_Per_Light : Button_Per_Light_Type;
       Curr_Joltages : Joltage_Array_Type;
-      Presses : Natural;
       Curr_Path_Len : Natural;
    begin
       Buttons_Per_Light := (others => 0);
@@ -144,28 +156,32 @@ package body Joltage is
          if Try_Button_Count > 1 then
             Try_Buttons (Buttons, Num_Buttons, Buttons_To_Try,
                1, Try_Button_Count, Required_Joltages, Joltages,
-               Max_Joltage_Num, Tried, Lights_Tried, Path_Len, Shortest_Path);
+               Max_Joltage_Num, Tried, Lights_Tried,
+               Best_Light,
+               Path_Len, Shortest_Path);
          else
-            Presses := Max_Presses (Buttons (Buttons_To_Try (1)),
-               Required_Joltages, Joltages, Max_Joltage_Num);
             Tried (Buttons_To_Try (1)) := True;
-            if Path_Len < Natural'Last - Presses then
-               Curr_Path_Len := Path_Len + Presses;
+            if Path_Len < Natural'Last - Best_Joltage_Count then
+               Curr_Path_Len := Path_Len + Best_Joltage_Count;
                if Curr_Path_Len < Shortest_Path then
                   Curr_Joltages := Joltages (Joltages'Range);
                   Press (Buttons (Buttons_To_Try (1)),
                      Curr_Joltages, Max_Joltage_Num,
-                     Presses);
+                     Best_Joltage_Count);
 
-                  if Joltages_Match (Curr_Joltages, Required_Joltages,
+                  if Joltages_Valid (Curr_Joltages, Required_Joltages,
                      Max_Joltage_Num)
                   then
-                     Shortest_Path := Curr_Path_Len;
-                  else
-                     Try_Presses (Buttons, Num_Buttons,
-                        Required_Joltages, Curr_Joltages, Max_Joltage_Num,
-                        Tried, Lights_Tried,
-                        Curr_Path_Len, Shortest_Path);
+                     if Joltages_Match (Curr_Joltages, Required_Joltages,
+                        Max_Joltage_Num)
+                     then
+                        Shortest_Path := Curr_Path_Len;
+                     else
+                        Try_Presses (Buttons, Num_Buttons,
+                           Required_Joltages, Curr_Joltages, Max_Joltage_Num,
+                           Tried, Lights_Tried,
+                           Curr_Path_Len, Shortest_Path);
+                     end if;
                   end if;
                end if;
             end if;
@@ -184,12 +200,14 @@ package body Joltage is
       Max_Joltage_Num : Light_Number_Range;
       Tried : in out Tried_Array_Type;
       Lights_Tried : in out Light_Tried_Array_Type;
+      Target_Light : Light_Number_Range;
       Path_Len : Natural;
       Shortest_Path : in out Natural)
    is
       Curr_Joltages : Joltage_Array_Type;
       Presses : Natural;
       Curr_Path_Len : Natural;
+      Joltage_Diff : Natural;
    begin
       Presses := Max_Presses (Buttons (Buttons_To_Try (Curr_Try_Button)),
          Required_Joltages, Joltages, Max_Joltage_Num);
@@ -215,6 +233,7 @@ package body Joltage is
                         Required_Joltages, Curr_Joltages,
                         Max_Joltage_Num,
                         Tried, Lights_Tried,
+                        Target_Light,
                         Curr_Path_Len, Shortest_Path);
                   else
                      Try_Presses (Buttons, Num_Buttons,
@@ -226,26 +245,34 @@ package body Joltage is
             end if;
          end loop;
       else
-         Presses := Max_Presses (Buttons (Buttons_To_Try (
-            Curr_Try_Button)),
-            Required_Joltages, Joltages, Max_Joltage_Num);
+         if Required_Joltages (Target_Light) > Joltages (Target_Light) then
+            Joltage_Diff := Required_Joltages (Target_Light) -
+               Joltages (Target_Light);
+         else
+            Joltage_Diff := 0;
+         end if;
+
          if Path_Len < Natural'Last - Presses then
             Curr_Path_Len := Path_Len + Presses;
             if Curr_Path_Len < Shortest_Path then
                Curr_Joltages := Joltages (Joltages'Range);
                Press (Buttons (Buttons_To_Try (Curr_Try_Button)),
                   Curr_Joltages, Max_Joltage_Num,
-                  Presses);
+                  Joltage_Diff);
 
-               if Joltages_Match (Curr_Joltages, Required_Joltages,
+               if Joltages_Valid (Curr_Joltages, Required_Joltages,
                   Max_Joltage_Num)
                then
-                  Shortest_Path := Curr_Path_Len;
-               else
-                  Try_Presses (Buttons, Num_Buttons,
-                     Required_Joltages, Curr_Joltages, Max_Joltage_Num,
-                     Tried, Lights_Tried,
-                     Curr_Path_Len, Shortest_Path);
+                  if Joltages_Match (Curr_Joltages, Required_Joltages,
+                     Max_Joltage_Num)
+                  then
+                     Shortest_Path := Curr_Path_Len;
+                  else
+                     Try_Presses (Buttons, Num_Buttons,
+                        Required_Joltages, Curr_Joltages, Max_Joltage_Num,
+                        Tried, Lights_Tried,
+                        Curr_Path_Len, Shortest_Path);
+                  end if;
                end if;
             end if;
          end if;
