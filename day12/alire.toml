@@ -1,0 +1,15 @@
+name = "day12"
+description = "Advent of Code 2025 Day 12"
+version = "0.1.0-dev"
+
+authors = ["Mark Wutka"]
+maintainers = ["Mark Wutka <mark@wutka.com>"]
+maintainers-logins = ["wutka"]
+licenses = "MIT OR Apache-2.0 WITH LLVM-exception"
+website = ""
+tags = []
+
+executables = ["day12"]
+
+[[depends-on]]
+gnatprove = "^15.1.0"
