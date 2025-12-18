@@ -113,6 +113,7 @@ procedure Day3 is
    end Find_Highest_Number;
 
 begin
+   Nat_64_IO.Default_Width := 0;
    Jolt_Sum_A := 0;
    Jolt_Sum_B := 0;
    Best_Digits := (others => 0);
@@ -145,11 +146,11 @@ begin
    end loop;
 
    Put ("day3a = ");
-   Nat_64_IO.Put (Jolt_Sum_A, Width => 0);
+   Nat_64_IO.Put (Jolt_Sum_A);
    New_Line;
 
    Put ("day3b = ");
-   Nat_64_IO.Put (Jolt_Sum_B, Width => 0);
+   Nat_64_IO.Put (Jolt_Sum_B);
    New_Line;
 
 exception
