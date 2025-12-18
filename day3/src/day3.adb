@@ -10,8 +10,7 @@ procedure Day3 is
    type Digit_Array is array (Positive range <>) of Single_Digit;
 
    Data_File : File_Type;
-   Ch : Character;
-   Line : String (1 .. 1000);
+   Line : String (1 .. 1000) with Relaxed_Initialization;
    Line_Digits : Digit_Array (1 .. 1000);
    Best_Digits : Digit_Array (1 .. 12);
    Last : Natural;
@@ -117,25 +116,14 @@ begin
    Jolt_Sum_A := 0;
    Jolt_Sum_B := 0;
    Best_Digits := (others => 0);
-   Line := (others => '0');
 
    Open (File => Data_File,
          Mode => In_File,
          Name => "data/day3.txt");
 
    while not End_Of_File (Data_File) loop
-      Last := 0;
 
-      while not End_Of_Line (Data_File) loop
-         Get (Data_File, Ch);
-         if Last < Line'Length then
-            Last := Last + 1;
-            if Last in Line'Range then
-               Line (Last) := Ch;
-            end if;
-         end if;
-      end loop;
-      Skip_Line (Data_File);
+      Get_Line (Data_File, Line, Last);
 
       if Last in Line'Range then
          Line_To_Digits (Line (1 .. Last), Line_Digits);
