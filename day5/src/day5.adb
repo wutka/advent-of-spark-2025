@@ -26,8 +26,7 @@ procedure Day5 is
    Start_ID : Nat_64;
    End_ID : Nat_64;
    Ingredient : Nat_64;
-   Ch : Character;
-   Line : String (1 .. 200);
+   Line : String (1 .. 200) with Relaxed_Initialization;
    Last : Natural;
    Dash_Pos : Natural;
    Ranges : Range_Set.Set (2000);
@@ -61,34 +60,28 @@ begin
    Line := [others => '0'];
 
    while not End_Of_File (Data_File) loop
-      Last := 0;
       Dash_Pos := 1;
       Start_ID := 0;
       End_ID := 0;
 
-      while not End_Of_Line (Data_File) loop
-         Get (Data_File, Ch);
-         if Last < Line'Length then
-            Last := Last + 1;
-            if Last in Line'Range then
-               Line (Last) := Ch;
-               if Ch = '-' then
-                  Dash_Pos := Last;
-               end if;
-            end if;
-         end if;
-      end loop;
-      Skip_Line (Data_File);
+      Get_Line (Data_File, Line, Last);
 
       exit when Last = 0;
+
+      Dash_Pos := 0;
+      for I in 1 .. Last loop
+         if Line (I) = '-' then
+            Dash_Pos := I;
+         end if;
+      end loop;
 
       if Dash_Pos > 1 and then
          Dash_Pos - 1 in Line'Range
       then
-         Parse_Nat64(Line (1 .. Dash_Pos - 1), Start_ID);
+         Parse_Nat64 (Line (1 .. Dash_Pos - 1), Start_ID);
       end if;
 
-      if Dash_Pos < Natural'Last and then
+      if Dash_Pos > 0 and then Dash_Pos < Natural'Last and then
          Dash_Pos + 1 in Line'Range and then
          Last in Line'Range
       then
